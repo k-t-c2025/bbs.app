@@ -4,21 +4,26 @@ body {
   background: #fafafa;
 }
 
-/* 入力欄 ------------------------- */
+/* 名前入力欄を大きく */
 #name {
-  font-size: 18px;   /* ← 名前を大きく */
-  padding: 5px;
-  width: 250px;
+  font-size: 18px;    /* 文字を大きく */
+  padding: 6px;       /* 枠内の余白を増やす */
+  width: 250px;       /* 横幅を広げる */
 }
 
+/* 投稿内容入力欄（textarea）を広げる */
 #text {
-  width: 350px;      /* 横幅（20文字相当）*/
-  height: 120px;     /* 縦高さ（5行相当）*/
   font-size: 16px;
   padding: 8px;
+
+  /* 横20文字くらい → width 約 320px */
+  width: 320px;
+
+  /* 縦5行くらい → height 約 100〜120px */
+  height: 120px;
 }
 
-/* 投稿カード ---------------------- */
+/* 投稿カード（既存） */
 .post {
   border: 1px solid #ccc;
   padding: 12px;
@@ -27,28 +32,22 @@ body {
   border-radius: 6px;
 }
 
-/* 名前を大きく */
 .post .name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 6px;
 }
 
-/* 投稿日時 */
 .post .time {
   font-size: 12px;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-/* 投稿内容 */
 .post .text {
   font-size: 16px;
   white-space: pre-wrap;
-  margin-bottom: 10px;
 }
 
-/* 投稿画像 */
 .post img {
   max-width: 250px;
   margin-top: 10px;
