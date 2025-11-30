@@ -47,3 +47,24 @@ body {
 .reply-form button {
   margin-top: 6px;
 }
+
+/* 削除ボタン */
+.deleteBtn {
+  padding: 6px 12px;
+  margin-top: 8px;
+  background: #ffdddd;
+  border: 1px solid #dd8888;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 返信ボタン */
+.reply-btn {
+  padding: 6px 12px;
+  margin-top: 8px;
+  background: #ddf;
+  border: 1px solid #88a;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
