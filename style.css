@@ -1,0 +1,81 @@
+/* ====== 全体レイアウト ====== */
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: #f5f5f7;
+    margin: 40px auto;
+    max-width: 600px;
+    padding: 10px;
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  /* ====== 入力系 ====== */
+  input, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    background: #4a90e2;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  button:hover {
+    background: #357dc9;
+  }
+  
+  /* ====== 投稿デザイン ====== */
+  .post {
+    background: white;
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    white-space: pre-wrap; /* 改行反映 */
+    position: relative;
+  }
+  
+  .name {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .time {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  /* ====== 画像 ====== */
+  .post img {
+    max-width: 100%;
+    border-radius: 6px;
+    margin-top: 10px;
+  }
+  
+  /* ====== 削除ボタン ====== */
+  .deleteBtn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 12px;
+    padding: 4px 8px;
+    background: #e63c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
