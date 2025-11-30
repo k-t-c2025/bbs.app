@@ -9,12 +9,13 @@ import {
 
 // --- Firebase 設定（ここをあなたの値に置き換える） ---
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyC10ERewIkpD_ZjQPneF3hWyunEKwBMCAQ",
+    authDomain: "keijibann-b44b8.firebaseapp.com",
+    projectId: "keijibann-b44b8",
+    storageBucket: "keijibann-b44b8.appspot.com",
+    messagingSenderId: "267259675864",
+    appId: "1:267259675864:web:971536e4f188051db5c3ad",
+    measurementId: "G-WW1ZETJDN8"
 };
 
 // 初期化（必ず1回）
