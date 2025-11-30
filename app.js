@@ -26,7 +26,7 @@ const textInput = document.getElementById("text");
 const sendBtn = document.getElementById("send");
 const postsDiv = document.getElementById("posts");
 
-// --- 新規投稿（親投稿） ---
+// --- 新規投稿 ---
 sendBtn.addEventListener("click", async () => {
   const name = (nameInput.value || "名無し").trim();
   const text = (textInput.value || "").trim();
@@ -49,6 +49,8 @@ onSnapshot(q, (snapshot) => {
 
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
+    const postId = docSnap.id;
+
     const card = document.createElement("div");
     card.className = "post";
 
@@ -58,14 +60,19 @@ onSnapshot(q, (snapshot) => {
       timeText = data.createdAt.toDate().toLocaleString("ja-JP");
     }
 
+    // 投稿カード
     card.innerHTML = `
       <div class="name">${escapeHtml(data.name || "名無し")}</div>
       <div class="time">${escapeHtml(timeText)}</div>
       <div class="text">${escapeHtml(data.text || "").replace(/\n/g, "<br>")}</div>
 
+      <!-- 削除ボタン -->
+      <button class="deleteBtn" data-id="${postId}">削除</button>
+
+      <!-- 返信ボタン -->
       <button class="reply-btn">返信</button>
 
-      <!-- 最初は隠す返信フォーム -->
+      <!-- 最初は非表示の返信フォーム -->
       <div class="reply-form">
         <input type="text" class="reply-name" placeholder="返信者名">
         <textarea class="reply-text" rows="3" placeholder="返信内容"></textarea>
@@ -77,13 +84,22 @@ onSnapshot(q, (snapshot) => {
   });
 });
 
-// --- 返信フォームの表示切替 ---
+// --- 削除処理（イベントデリゲーション） ---
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("deleteBtn")) {
+    const id = e.target.dataset.id;
+
+    if (!confirm("この投稿を削除しますか？")) return;
+
+    await deleteDoc(doc(getFirestore(), "posts", id));
+  }
+});
+
+// --- 返信フォームの表示切り替え ---
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("reply-btn")) {
     const form = e.target.nextElementSibling;
-
-    form.style.display =
-      form.style.display === "block" ? "none" : "block";
+    form.style.display = form.style.display === "block" ? "none" : "block";
   }
 });
 
