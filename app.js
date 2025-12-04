@@ -47,42 +47,103 @@ const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 onSnapshot(q, (snapshot) => {
   postsDiv.innerHTML = "";
 
+  // 大分類を作る { "2025-11": { "2025-11-30": [投稿,...], ... } }
+  const groups = {};
+
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
-    const postId = docSnap.id;
+    if (!data.createdAt?.toDate) return;
 
-    const card = document.createElement("div");
-    card.className = "post";
+    const date = data.createdAt.toDate();
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
 
-    // 日時整形
-    let timeText = "日時なし";
-    if (data.createdAt?.toDate) {
-      timeText = data.createdAt.toDate().toLocaleString("ja-JP");
-    }
+    const ymKey = `${y}-${m}`;
+    const ymdKey = `${y}-${m}-${d}`;
 
-    // 投稿カード
-    card.innerHTML = `
-      <div class="name">${escapeHtml(data.name || "名無し")}</div>
-      <div class="time">${escapeHtml(timeText)}</div>
-      <div class="text">${escapeHtml(data.text || "").replace(/\n/g, "<br>")}</div>
+    if (!groups[ymKey]) groups[ymKey] = {};
+    if (!groups[ymKey][ymdKey]) groups[ymKey][ymdKey] = [];
 
-      <!-- 削除ボタン -->
-      <button class="deleteBtn" data-id="${postId}">削除</button>
-
-      <!-- 返信ボタン -->
-      <button class="reply-btn">返信</button>
-
-      <!-- 最初は非表示の返信フォーム -->
-      <div class="reply-form">
-        <input type="text" class="reply-name" placeholder="返信者名">
-        <textarea class="reply-text" rows="3" placeholder="返信内容"></textarea>
-        <button class="reply-send">返信する</button>
-      </div>
-    `;
-
-    postsDiv.appendChild(card);
+    groups[ymKey][ymdKey].push({ id: docSnap.id, ...data });
   });
+
+  // --- 月一覧を生成 ---
+  for (const ym in groups) {
+    const [year, month] = ym.split("-");
+
+    // 月タイトル
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "month";
+    monthDiv.textContent = `${year}年 ${month}月`;
+    monthDiv.style.cursor = "pointer";
+
+    // 月クリック → 日ブロックの表示切り替え
+    monthDiv.addEventListener("click", () => {
+      dayBox.style.display =
+        dayBox.style.display === "none" ? "block" : "none";
+    });
+
+    postsDiv.appendChild(monthDiv);
+
+    // 日一覧を格納する div
+    const dayBox = document.createElement("div");
+    dayBox.className = "day-box";
+    dayBox.style.display = "none";
+    dayBox.style.marginLeft = "20px";
+
+    postsDiv.appendChild(dayBox);
+
+    // --- 日一覧を生成 ---
+    for (const ymd in groups[ym]) {
+      const [, , day] = ymd.split("-");
+
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+      dayDiv.textContent = `${day}日`;
+      dayDiv.style.cursor = "pointer";
+      dayDiv.style.marginBottom = "4px";
+
+      // クリックで投稿一覧を開閉
+      const postBox = document.createElement("div");
+      postBox.className = "post-box";
+      postBox.style.display = "none";
+      postBox.style.marginLeft = "20px";
+
+      dayDiv.addEventListener("click", () => {
+        postBox.style.display =
+          postBox.style.display === "none" ? "block" : "none";
+      });
+
+      dayBox.appendChild(dayDiv);
+      dayBox.appendChild(postBox);
+
+      // --- 投稿を追加 ---
+      groups[ym][ymd].forEach((post) => {
+        const card = document.createElement("div");
+        card.className = "post";
+        const timeText = post.createdAt.toDate().toLocaleString("ja-JP");
+
+        card.innerHTML = `
+          <div class="name">${escapeHtml(post.name)}</div>
+          <div class="time">${escapeHtml(timeText)}</div>
+          <div class="text">${escapeHtml(post.text).replace(/\n/g, "<br>")}</div>
+          <button class="deleteBtn" data-id="${post.id}">削除</button>
+          <button class="reply-btn">返信</button>
+
+          <div class="reply-form">
+            <input type="text" class="reply-name" placeholder="返信者名">
+            <textarea class="reply-text" rows="3" placeholder="返信内容"></textarea>
+            <button class="reply-send">返信する</button>
+          </div>
+        `;
+
+        postBox.appendChild(card);
+      });
+    }
+  }
 });
+
 
 // --- 削除処理（イベントデリゲーション） ---
 document.addEventListener("click", async (e) => {
@@ -102,6 +163,95 @@ document.addEventListener("click", (e) => {
     form.style.display = form.style.display === "block" ? "none" : "block";
   }
 });
+
+// ==== 設定 ====
+// バッジと点滅を保持する期間（ミリ秒）→ 7日
+const HOLD_DURATION = 7 * 24 * 60 * 60 * 1000; 
+
+// 保存キー
+const STORAGE_KEY = "lastPostTime";
+
+// ----------------------------------
+// タイトル点滅
+// ----------------------------------
+let blinkInterval;
+let isBlinking = false;
+
+function startTitleBlink(message = "🔔 新着あり!") {
+    if (isBlinking) return;
+    isBlinking = true;
+
+    const originalTitle = document.title;
+    let flag = false;
+
+    blinkInterval = setInterval(() => {
+        document.title = flag ? message : originalTitle;
+        flag = !flag;
+    }, 800);
+}
+
+function stopTitleBlink() {
+    clearInterval(blinkInterval);
+    isBlinking = false;
+    document.title = "掲示板";
+}
+
+// ----------------------------------
+// バッジ表示
+// ----------------------------------
+function updateBadge(count) {
+    const badge = document.getElementById("badge");
+    if (count > 0) {
+        badge.style.display = "inline-block";
+        badge.textContent = count;
+    } else {
+        badge.style.display = "none";
+    }
+}
+
+// ----------------------------------
+// 新着があった瞬間に呼ぶ関数
+// ----------------------------------
+function onNewPost() {
+    const now = Date.now();
+    localStorage.setItem(STORAGE_KEY, now);
+
+    updateBadge(1);
+    startTitleBlink();
+}
+
+// ----------------------------------
+// ページ表示時に実行 → 7日以内なら通知維持
+// ----------------------------------
+function checkNotificationStatus() {
+    const lastPost = localStorage.getItem(STORAGE_KEY);
+    if (!lastPost) return;
+
+    const now = Date.now();
+    const diff = now - Number(lastPost);
+
+    if (diff < HOLD_DURATION) {
+        // 7日以内 → 通知を維持
+        updateBadge(1);
+        startTitleBlink();
+    } else {
+        // 7日経過 → 自動消去
+        onUserViewed();
+    }
+}
+
+// ----------------------------------
+// ユーザーが確認したとき（掲示板開くなど）
+function onUserViewed() {
+    updateBadge(0);
+    stopTitleBlink();
+    localStorage.removeItem(STORAGE_KEY);
+}
+
+// ----------------------------------
+// ページ読み込み時に自動チェック
+window.onload = checkNotificationStatus;
+
 
 // HTMLエスケープ
 function escapeHtml(str) {
