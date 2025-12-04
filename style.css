@@ -104,6 +104,29 @@ body {
   border-left: 5px solid #ff5a5a;
 }
 
+#text {
+  font-size: 16px;
+  width: auto;   /* cols=20 が有効になる */
+  height: auto;  /* rows=5 が有効になる */
+}
+
+.replyForm input,
+.replyForm textarea {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.replyBtn,
+.sendReply {
+  background: #ffa500;
+  margin-top: 5px;
+}
+.replyBtn:hover,
+.sendReply:hover {
+  background: #ff8c00;
+}
+
+
 /* -----------------------------
   フォーム
 ----------------------------- */
