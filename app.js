@@ -207,8 +207,10 @@ function renderDateTree(posts) {
     yearWrap.appendChild(monthList);
 
     yTag.addEventListener("click", () => {
+      postsArea.innerHTML = "";  // ★追加
       monthList.style.display = monthList.style.display === "none" ? "block" : "none";
     });
+    
 
     // months sorted desc
     const months = Object.keys(groups[year]).sort((a,b)=>Number(b)-Number(a));
@@ -225,8 +227,10 @@ function renderDateTree(posts) {
       monthList.appendChild(dayList);
 
       mTag.addEventListener("click", () => {
+        postsArea.innerHTML = "";  // ★追加
         dayList.style.display = dayList.style.display === "none" ? "block" : "none";
       });
+      
 
       // days sorted desc
       const days = Object.keys(groups[year][m]).sort((a,b)=>Number(b)-Number(a));
